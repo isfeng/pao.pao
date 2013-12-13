@@ -1,0 +1,113 @@
+@main("paopaonet") {
+
+	<div class="canvas_holder">
+    	<canvas id="canvax"></canvas>
+    </div>
+    
+	<script>
+     	// Initialize the Facebook JavaScript SDK
+		FB.init({
+			appId : '770219392992031',
+			xfbml : true,
+			status : true,
+			cookie : true
+		});
+
+		init();
+		
+		// Check if the current user is logged in and has authorized the app
+		FB.getLoginStatus(checkLoginStatus);
+
+		// Login in the current user via Facebook and ask for email permission
+		function authUser() {
+			FB.login(function(response){
+				if (response && response.status == 'connected') {
+					show_me();
+				} else {
+					parent.location.href = 'https://www.facebook.com/';
+				}
+			});
+		}
+
+		var canvas, stage, me, mouseX, mouseY, friends=[], max_distance;
+		
+		function show_me() {
+			FB.api('/me/picture', function(response) {
+				console.log(response.data.url);
+				me = new createjs.Bitmap(response.data.url);
+	            me.x = _.random(0, canvas.width-100);
+	            me.y = _.random(0, canvas.height-100);
+	            stage.addChild(me);
+
+	            _.max([], function(distance){
+	                    max_distance = distance;
+	            });
+			});
+		}
+
+		function show_friends(){
+			FB.api('/me/friends', function(response) {
+				console.log(response);
+				var _friends = response.data;
+				for (i in _friends) {
+					getPicture(_friends[i].id, function(response){
+		                var x = _.random(0, canvas.width - 100);
+		                var y = _.random(0, canvas.height - 100);
+		                var easing = _.random(1, 5) / 500;
+		                var circle = new Circle(response.data.url, x, y, easing);
+		                circle.draw(stage);
+		                friends.push(circle);
+					});
+	       		}
+			});
+			
+			/*
+			for (i in friends) {
+                // console.log(conns[i].pictureUrl);
+                if (conns[i].pictureUrl) {
+                        // var conn = new createjs.Bitmap(conns[i].pictureUrl);
+                        var x = _.random(0, canvas.width - 100);
+                        var y = _.random(0, canvas.height - 100);
+                        var easing = _.random(1, 5) / 500;
+                        var conn = new Profile(conns[i].pictureUrl, x, y, easing);
+                        conn.draw(stage);
+                        connections.push(conn);
+                }
+       		}
+       		*/
+		}
+		
+		// Check the result of the user status and display login button if necessary
+		function checkLoginStatus(response) {
+			if (response && response.status == 'connected') {
+				show_me();
+				show_friends();
+			} else {
+				authUser();
+			}
+		}
+
+		function init() {
+            canvas = document.getElementById("canvax");
+            stage = new createjs.Stage(canvas);
+            canvas.width = window.innerWidth-10;
+		    canvas.height = window.innerHeight-10;
+		
+		    stage.addEventListener("stagemousemove", function(evt) {
+		        mouseX = evt.stageX;
+		        mouseY = evt.stageY;
+		    })
+		
+		    createjs.Ticker.addEventListener("tick", tick);
+		    createjs.Ticker.setFPS(30);
+    	}
+
+		function tick(event) {
+            stage.update(event);
+    	}
+
+    	function getPicture(fbid, callback){
+    		FB.api('/'+fbid+'/picture', callback);
+    	}
+	</script>
+}
