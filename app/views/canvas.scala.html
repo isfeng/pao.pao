@@ -1,4 +1,4 @@
-@main("paopaonet") {
+@main("paopaoyo") {
 
 	<div class="canvas_holder">
     	<canvas id="canvax"></canvas>
@@ -33,7 +33,7 @@
 		
 		function show_me() {
 			FB.api('/me/picture', function(response) {
-				console.log(response.data.url);
+				// console.log(response.data.url);
 				me = new createjs.Bitmap(response.data.url);
 	            me.x = _.random(0, canvas.width-100);
 	            me.y = _.random(0, canvas.height-100);
@@ -51,9 +51,10 @@
 				var _friends = response.data;
 				for (i in _friends) {
 					getPicture(_friends[i].id, function(response){
-		                var x = _.random(0, canvas.width - 100);
-		                var y = _.random(0, canvas.height - 100);
+		                var x = _.random(0, canvas.width - 0);
+		                var y = _.random(0, canvas.height - 0);
 		                var easing = _.random(1, 5) / 500;
+		                console.log(response.data.url);
 		                var circle = new Circle(response.data.url, x, y, easing);
 		                circle.draw(stage);
 		                friends.push(circle);
@@ -90,9 +91,9 @@
 		function init() {
             canvas = document.getElementById("canvax");
             stage = new createjs.Stage(canvas);
-            canvas.width = window.innerWidth-10;
-		    canvas.height = window.innerHeight-10;
-		
+            canvas.width = window.innerWidth-20;
+		    canvas.height = window.outerHeight-150;
+			console.log(window);
 		    stage.addEventListener("stagemousemove", function(evt) {
 		        mouseX = evt.stageX;
 		        mouseY = evt.stageY;
@@ -103,7 +104,11 @@
     	}
 
 		function tick(event) {
-            stage.update(event);
+			_.each(friends, function(friend) {
+				if(!friend.near(mouseX, mouseY))
+					friend.arround(me.x, me.y, max_distance - 100);
+			});
+			stage.update(event);
     	}
 
     	function getPicture(fbid, callback){

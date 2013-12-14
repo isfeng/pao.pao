@@ -1,4 +1,7 @@
-*{
-	margin: 0;
-	padding: 0;
+
+.canvas_holder{
+	/*border: 1px solid blue;*/
+}
+#canvax{
+	/*border: 1px solid red;*/
 }
