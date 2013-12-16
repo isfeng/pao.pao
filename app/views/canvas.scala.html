@@ -51,15 +51,12 @@
 				// console.log(response);
 				var _friends = response.data;
 				for (i in _friends) {
-					getPicture(_friends[i].id, function(response){
-		                var x = _.random(0, canvas.width - 0);
-		                var y = _.random(0, canvas.height - 0);
-		                var easing = _.random(1, 5) / 500;
-		                // console.log(response.data.url);
-		                var circle = new Circle(response.data.url, x, y, easing);
-		                circle.draw(stage);
-		                friends.push(circle);
-					});
+					var x = _.random(0, canvas.width - 0);
+	                var y = _.random(0, canvas.height - 0);
+	                var easing = _.random(1, 5) / 500;
+		            var circle = new Circle(_friends[i].id, x, y, easing);
+	                circle.draw(stage);
+	                friends.push(circle);
 	       		}
 			});
 		}
@@ -97,8 +94,8 @@
 			stage.update(event);
     	}
 
-    	function getPicture(fbid, callback){
-    		FB.api('/'+fbid+'/picture', callback);
-    	}
+    	// function getPicture(fbid, callback){
+    	// 	FB.api('/'+fbid+'/picture', callback);
+    	// }
 	</script>
 }
