@@ -23,6 +23,7 @@
 			FB.login(function(response){
 				if (response && response.status == 'connected') {
 					show_me();
+					show_friends();
 				} else {
 					parent.location.href = 'https://www.facebook.com/';
 				}
@@ -61,21 +62,6 @@
 					});
 	       		}
 			});
-			
-			/*
-			for (i in friends) {
-                // console.log(conns[i].pictureUrl);
-                if (conns[i].pictureUrl) {
-                        // var conn = new createjs.Bitmap(conns[i].pictureUrl);
-                        var x = _.random(0, canvas.width - 100);
-                        var y = _.random(0, canvas.height - 100);
-                        var easing = _.random(1, 5) / 500;
-                        var conn = new Profile(conns[i].pictureUrl, x, y, easing);
-                        conn.draw(stage);
-                        connections.push(conn);
-                }
-       		}
-       		*/
 		}
 		
 		// Check the result of the user status and display login button if necessary
