@@ -26,35 +26,39 @@ class window.Circle
         @hitObj.addEventListener "click", @handle_click
     
     handle_click: (event)=>
-        console.log event
-        console.log @id
         @show_friends()
          
-    draw: (stage)->
+    draw: (stage, max)->
         @stage = stage
+        if(max)
+        	@max_distance = max
+        else
+        	@max_distance = if @stage.canvas.width > @stage.canvas.height then @stage.canvas.width else @stage.canvas.height
+        	
         stage.addChild(@hitObj)
         stage.addChild(@shape)
         
-    arround: (mouseX, mouseY, max_distance)->
-        dx = mouseX - @shape.x;
-        dy = mouseY - @shape.y;
-        
-        if Math.sqrt(dx * dx + dy * dy) > max_distance
-          @shape.x += dx * @easing;
-          @shape.y += dy * @easing;
-        else if (Math.sqrt(dx * dx + dy * dy) < 120)
-          @shape.x -= dx * @easing;
-          @shape.y -= dy * @easing;
-
-        x1 = @shape.x - mouseX;
-        y1 = @shape.y - mouseY;
-        x2 = x1 * @cosvr - y1 * @sinvr;
-        y2 = y1 * @cosvr + x1 * @sinvr;
-        @hitObj.x = @shape.x = mouseX + x2;
-        @hitObj.y = @shape.y = mouseY + y2;
-        for friend in @friends
-            friend.arround @x, @y, 500
-
+    arround: (centerX, centerY)->
+        if @friends.length > 0 
+        	friend.arround @hitObj.x, @hitObj.y for friend in @friends
+        else
+        	dx = centerX - @shape.x;
+	        dy = centerY - @shape.y;
+	        
+	        if Math.sqrt(dx * dx + dy * dy) > @max_distance
+	          @shape.x += dx * @easing;
+	          @shape.y += dy * @easing;
+	        else if (Math.sqrt(dx * dx + dy * dy) < 50)
+	          @shape.x -= dx * @easing;
+	          @shape.y -= dy * @easing;
+	
+	        x1 = @shape.x - centerX;
+	        y1 = @shape.y - centerY;
+	        x2 = x1 * @cosvr - y1 * @sinvr;
+	        y2 = y1 * @cosvr + x1 * @sinvr;
+	        @hitObj.x = @shape.x = centerX + x2;
+	        @hitObj.y = @shape.y = centerY + y2;
+        	
     near: (mouseX, mouseY)->
         dx = mouseX - @shape.x;
         dy = mouseY - @shape.y;
@@ -63,20 +67,17 @@ class window.Circle
     load_picture: (callback)->
         FB.api('/'+@id+'/picture', callback);
 
-    show_friends: ()->
-        console.log 'show_friends'
-        console.log @id
+    show_friends: ()=>
+        return if @friends.length > 0
         FB.api '/'+@id+'/friends', (response)=>
-            console.log response
-            _friends = response.data
-            console.log response
-            for friend in _friends
-                do (friend) ->
-                    x = _.random(0, @canvas.width - 0)
-                    y = _.random(0, @canvas.height - 0)
-                    easing = _.random(1, 5) / 500
-                    circle = new Circle(friend.id, x, y, easing)
-                    @friends.push(circle)
-                    circle.draw(@stage)
-
-
+            if(!response.error)
+            	_friends = response.data
+	            console.log response
+	            for friend in _friends
+	                do (friend) =>
+	                    x = _.random(0, @stage.canvas.width)
+	                    y = _.random(0, @stage.canvas.height)
+	                    easing = _.random(1, 5) / 500
+	                    circle = new Circle(friend.id, x, y, easing)
+	                    @friends.push(circle)
+	                    circle.draw(@stage)
