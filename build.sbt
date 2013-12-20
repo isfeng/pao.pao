@@ -1,4 +1,4 @@
-name := "paopaoyo"
+name := "paopao"
 
 version := "1.0-SNAPSHOT"
 
